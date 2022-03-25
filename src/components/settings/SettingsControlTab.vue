@@ -353,7 +353,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
             case 'qgl':
                 return this.$t('Panels.ToolheadControlPanel.QGL')
 
-            case 'ztitl':
+            case 'ztilt':
                 return this.$t('Panels.ToolheadControlPanel.ZTilt')
 
             default:
