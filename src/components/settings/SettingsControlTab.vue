@@ -345,7 +345,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
     }
 
     get defaultActionButton() {
-        return this.$store.getters['printer/getDefaultControlActionButton']
+        return this.$store.getters['gui/getDefaultControlActionButton']
     }
 
     get defaultActionButtonText() {

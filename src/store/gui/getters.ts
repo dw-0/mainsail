@@ -63,9 +63,14 @@ export const getters: GetterTree<GuiState, any> = {
         return panels
     },
 
-    getDefaultControlActionButton: (state, getters, rootState, rootGetters) => {
-        if (rootGetters['printer/existsQGL']) return 'qgl'
-        else if (rootGetters['printer/existsZtilt']) return 'ztilt'
+    getDefaultControlActionButton: (state, getters, rootState) => {
+        /*if (rootGetters['printer/existsQGL']) return 'qgl'
+        else if (rootGetters['printer/existsZtilt']) return 'ztilt'*/
+
+        if (rootState.printer.configfile?.settings) {
+            if ('quad_gantry_level' in rootState.printer.configfile.settings) return 'qgl'
+            else if ('z_tilt' in rootState.printer.configfile.settings) return 'ztilt'
+        }
 
         return 'm85'
     },
