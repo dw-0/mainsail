@@ -2,7 +2,7 @@
 
 <template>
     <div>
-        <v-card flat>
+        <v-card v-if="!form.bool" flat>
             <v-card-text>
                 <v-form ref="formControlExtruder">
                     <!-- TOOLHEAD CONTROL SETTINGS -->
@@ -231,6 +231,27 @@
                             hide-spin-buttons />
                     </settings-row>
                     <v-divider class="my-2"></v-divider>
+                    <!-- TOOLHEAD 3-DOT MENU CUSTOM BUTTONS -->
+                    <div v-for="(button, index) in customButtons" :key="index">
+                        <v-divider v-if="index" class="my-2"></v-divider>
+                        <settings-row :title="button.name">
+                            <v-btn small outlined class="ml-3" @click="editCustomButton(button)">
+                                <v-icon left small>{{ mdiPencil }}</v-icon>
+                                {{ $t('Settings.Edit') }}
+                            </v-btn>
+                            <v-btn
+                                small
+                                outlined
+                                class="ml-3 minwidth-0 px-2"
+                                color="error"
+                                @click="deleteCustomButton(button.id)">
+                                <v-icon small>{{ mdiDelete }}</v-icon>
+                            </v-btn>
+                        </settings-row>
+                    </div>
+                    <v-card-actions class="d-flex justify-end">
+                        <v-btn text color="primary" @click="createCustomButton">Add custom button</v-btn>
+                    </v-card-actions>
                     <!-- EXTRUDER CONTROL SETTINGS -->
                     <v-card-title class="mx-n4">{{ $t('Panels.ExtruderControlPanel.Headline') }}</v-card-title>
                     <settings-row
@@ -285,6 +306,43 @@
                 </v-form>
             </v-card-text>
         </v-card>
+        <v-card v-else flat>
+            <v-form v-model="form.valid" @submit.prevent="saveCustomButton">
+                <v-card-title>
+                    {{ form.id === null ? 'Create Button' : 'Edit Button' }}
+                </v-card-title>
+                <v-card-text>
+                    <v-row>
+                        <v-col class="col-4">
+                            <v-text-field
+                                v-model="form.name"
+                                label="Button name"
+                                :rules="[rules.required, rules.unique]"
+                                hide-details="auto"
+                                dense
+                                outlined></v-text-field>
+                        </v-col>
+                        <v-col class="col-8">
+                            <v-text-field
+                                v-model="form.command"
+                                label="Command"
+                                :rules="[rules.required]"
+                                outlined
+                                dense
+                                hide-details="auto"></v-text-field>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-actions class="d-flex justify-end">
+                    <v-btn text @click="form.bool = false">
+                        {{ $t('Settings.Cancel') }}
+                    </v-btn>
+                    <v-btn color="primary" text type="submit">
+                        {{ form.id === null ? 'Store Button' : 'Update Button' }}
+                    </v-btn>
+                </v-card-actions>
+            </v-form>
+        </v-card>
     </div>
 </template>
 
@@ -293,11 +351,23 @@ import { Component, Mixins } from 'vue-property-decorator'
 import BaseMixin from '@/components/mixins/base'
 import ControlMixin from '@/components/mixins/control'
 import SettingsRow from '@/components/settings/SettingsRow.vue'
+import { mdiPencil, mdiDelete } from '@mdi/js'
+
+interface customButtonForm {
+    bool: boolean
+    id: string | null
+    valid: boolean
+    name: string
+    command: string
+}
 
 @Component({
     components: { SettingsRow },
 })
 export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) {
+    mdiPencil = mdiPencil
+    mdiDelete = mdiDelete
+
     declare $refs: {
         formControlExtruder: HTMLFormElement
     }
@@ -324,7 +394,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
     }
 
     set controlStyle(newVal) {
-        this.$store.dispatch('gui/saveSetting', { name: 'control.style', value: newVal })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'style', value: newVal })
     }
 
     get actionOptions() {
@@ -360,11 +430,11 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
     }
 
     set actionButton(newVal) {
-        this.$store.dispatch('gui/saveSetting', { name: 'control.actionButton', value: newVal })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'actionButton', value: newVal })
     }
 
     get defaultActionButton() {
-        return this.$store.getters['gui/getDefaultControlActionButton']
+        return this.$store.getters['gui/control/getDefaultControlActionButton']
     }
 
     get enableXYHoming(): boolean {
@@ -372,7 +442,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
     }
 
     set enableXYHoming(newVal) {
-        this.$store.dispatch('gui/saveSetting', { name: 'control.enableXYHoming', value: newVal })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'enableXYHoming', value: newVal })
     }
 
     get displayZOffsetStandby() {
@@ -380,7 +450,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
     }
 
     set displayZOffsetStandby(newVal) {
-        this.$store.dispatch('gui/saveSetting', { name: 'control.displayZOffsetStandby', value: newVal })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'displayZOffsetStandby', value: newVal })
     }
 
     get reverseX() {
@@ -388,7 +458,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
     }
 
     set reverseX(newVal) {
-        this.$store.dispatch('gui/saveSetting', { name: 'control.reverseX', value: newVal })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'reverseX', value: newVal })
     }
 
     get reverseY() {
@@ -396,7 +466,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
     }
 
     set reverseY(newVal) {
-        this.$store.dispatch('gui/saveSetting', { name: 'control.reverseY', value: newVal })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'reverseY', value: newVal })
     }
 
     get reverseZ() {
@@ -404,7 +474,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
     }
 
     set reverseZ(newVal) {
-        this.$store.dispatch('gui/saveSetting', { name: 'control.reverseZ', value: newVal })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'reverseZ', value: newVal })
     }
 
     get feedrateXY() {
@@ -412,7 +482,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
     }
 
     set feedrateXY(newVal) {
-        this.$store.dispatch('gui/saveSetting', { name: 'control.feedrateXY', value: newVal })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'feedrateXY', value: newVal })
     }
 
     get feedrateZ() {
@@ -420,7 +490,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
     }
 
     set feedrateZ(newVal) {
-        this.$store.dispatch('gui/saveSetting', { name: 'control.feedrateZ', value: newVal })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'feedrateZ', value: newVal })
     }
 
     get offsetsZ() {
@@ -434,7 +504,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
         // Use a set to prevent adding duplicate entries.
         const absSteps = new Set()
         for (const value of steps) absSteps.add(Math.abs(value))
-        this.$store.dispatch('gui/saveSetting', { name: 'control.offsetsZ', value: Array.from(absSteps) })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'offsetsZ', value: Array.from(absSteps) })
     }
 
     get stepsAll() {
@@ -449,7 +519,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
         for (const value of newVal) absSteps.push(Math.abs(value))
         const steps = absSteps.filter(this.onlyUnique)
 
-        this.$store.dispatch('gui/saveSetting', { name: 'control.stepsAll', value: steps })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'stepsAll', value: steps })
     }
 
     get stepsXY() {
@@ -464,7 +534,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
         for (const value of newVal) absSteps.push(Math.abs(value))
         const steps = absSteps.filter(this.onlyUnique)
 
-        this.$store.dispatch('gui/saveSetting', { name: 'control.stepsXY', value: steps })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'stepsXY', value: steps })
     }
 
     get stepsZ() {
@@ -479,7 +549,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
         for (const value of newVal) absSteps.push(Math.abs(value))
         const steps = absSteps.filter(this.onlyUnique)
 
-        this.$store.dispatch('gui/saveSetting', { name: 'control.stepsZ', value: steps })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'stepsZ', value: steps })
     }
 
     get stepsCircleXY() {
@@ -494,7 +564,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
         for (const value of newVal) absSteps.push(Math.abs(value))
         const steps = absSteps.filter(this.onlyUnique)
 
-        this.$store.dispatch('gui/saveSetting', { name: 'control.stepsCircleXY', value: steps })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'stepsCircleXY', value: steps })
     }
 
     get stepsCircleZ() {
@@ -509,7 +579,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
         for (const value of newVal) absSteps.push(Math.abs(value))
         const steps = absSteps.filter(this.onlyUnique)
 
-        this.$store.dispatch('gui/saveSetting', { name: 'control.stepsCircleZ', value: steps })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'stepsCircleZ', value: steps })
     }
 
     get feedamountsE() {
@@ -524,7 +594,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
         for (const value of newVal) absAmounts.push(Math.abs(value))
         const amounts = absAmounts.filter(this.onlyUnique)
 
-        this.$store.dispatch('gui/saveSetting', { name: 'control.extruder.feedamounts', value: amounts })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'extruder.feedamounts', value: amounts })
     }
 
     get feedratesE() {
@@ -539,7 +609,7 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
         for (const value of newVal) absRates.push(Math.abs(value))
         const rates = absRates.filter(this.onlyUnique)
 
-        this.$store.dispatch('gui/saveSetting', { name: 'control.extruder.feedrates', value: rates })
+        this.$store.dispatch('gui/control/saveSetting', { name: 'extruder.feedrates', value: rates })
     }
 
     get showEstimatedExtrusionInfo() {
@@ -547,7 +617,10 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
     }
 
     set showEstimatedExtrusionInfo(newVal) {
-        this.$store.dispatch('gui/saveSetting', { name: 'control.extruder.showEstimatedExtrusionInfo', value: newVal })
+        this.$store.dispatch('gui/control/saveSetting', {
+            name: 'extruder.showEstimatedExtrusionInfo',
+            value: newVal,
+        })
     }
 
     blurFeedrateXY() {
@@ -564,6 +637,70 @@ export default class SettingsControlTab extends Mixins(BaseMixin, ControlMixin) 
 
     mounted() {
         this.$refs.formControlExtruder.validate()
+    }
+
+    /**
+     * Custom toolhead 3-dot menu button
+     */
+    private form: customButtonForm = {
+        bool: false,
+        valid: false,
+        name: '',
+        command: '',
+        id: null,
+    }
+
+    private rules = {
+        required: (value: string) => value !== '' || 'required',
+        unique: (value: string) => !this.existsButtonName(value) || 'Name already exists',
+    }
+
+    get customButtons() {
+        return this.$store.getters['gui/control/getCustomButtons'] ?? []
+    }
+
+    existsButtonName(name: string) {
+        return this.customButtons.findIndex((button: any) => button.name === name && button.id !== this.form.id) >= 0
+    }
+
+    clearForm() {
+        this.form.bool = false
+        this.form.id = null
+        this.form.name = ''
+        this.form.command = ''
+    }
+
+    createCustomButton() {
+        this.clearForm()
+        this.form.bool = true
+    }
+
+    editCustomButton(button: any) {
+        this.form.name = button.name
+        this.form.id = button.id
+        this.form.command = button.command
+
+        this.form.bool = true
+    }
+
+    saveCustomButton() {
+        if (this.form.valid) {
+            const button = {
+                name: this.form.name,
+                bool: this.form.bool,
+                command: this.form.command,
+            }
+
+            if (this.form.id)
+                this.$store.dispatch('gui/control/customButtonUpdate', { id: this.form.id, values: button })
+            else this.$store.dispatch('gui/control/customButtonStore', { values: button })
+
+            this.clearForm()
+        }
+    }
+
+    deleteCustomButton(id: string) {
+        this.$store.dispatch('gui/control/customButtonDelete', id)
     }
 }
 </script>

@@ -1,5 +1,6 @@
 import { GuiMacrosState } from '@/store/gui/macros/types'
 import { GuiConsoleState } from '@/store/gui/console/types'
+import { GuiControlState } from '@/store/gui/control/types'
 import { GuiPresetsState } from '@/store/gui/presets/types'
 import { GuiRemoteprintersState } from '@/store/gui/remoteprinters/types'
 import { ServerHistoryStateJob } from '@/store/server/history/types'
@@ -12,31 +13,7 @@ export interface GuiState {
         calcEtaTime: string[] // file, filament, slicer are possible values
     }
     console?: GuiConsoleState
-    control: {
-        style: 'bars' | 'circle' | 'cross'
-        actionButton: null | 'm84' | 'qgl' | 'ztilt'
-        enableXYHoming: boolean
-        displayZOffsetStandby: boolean
-        feedrateXY: number
-        stepsXY: number[]
-        feedrateZ: number
-        offsetsZ: number[]
-        stepsZ: number[]
-        stepsAll: number[]
-        stepsCircleXY: number[]
-        stepsCircleZ: number[]
-        selectedCrossStep: null | number
-        reverseX: boolean
-        reverseY: boolean
-        reverseZ: boolean
-        extruder: {
-            feedamount: number
-            feedamounts: number[]
-            feedrate: number
-            feedrates: number[]
-            showEstimatedExtrusionInfo: boolean
-        }
-    }
+    control?: GuiControlState
     dashboard: {
         nonExpandPanels: {
             [index: string]: string[]

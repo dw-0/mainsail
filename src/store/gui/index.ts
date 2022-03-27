@@ -7,6 +7,7 @@ import { defaultLogoColor, defaultPrimaryColor } from '@/store/variables'
 
 // load modules
 import { console } from '@/store/gui/console'
+import { control } from '@/store/gui/control'
 import { gcodehistory } from '@/store/gui/gcodehistory'
 import { macros } from '@/store/gui/macros'
 import { presets } from '@/store/gui/presets'
@@ -20,31 +21,6 @@ export const getDefaultState = (): GuiState => {
             language: 'en',
             calcEstimateTime: ['file', 'filament'],
             calcEtaTime: ['file', 'filament', 'slicer'],
-        },
-        control: {
-            style: 'bars',
-            actionButton: null,
-            enableXYHoming: false,
-            displayZOffsetStandby: false,
-            feedrateXY: 100,
-            stepsXY: [100, 10, 1],
-            feedrateZ: 25,
-            offsetsZ: [0.005, 0.01, 0.025, 0.05],
-            stepsZ: [25, 1, 0.1],
-            stepsAll: [0.1, 1, 10, 25, 50, 100],
-            stepsCircleXY: [1, 10, 50, 100],
-            stepsCircleZ: [0.1, 1, 10, 50],
-            selectedCrossStep: null,
-            reverseX: false,
-            reverseY: false,
-            reverseZ: false,
-            extruder: {
-                feedamount: 25,
-                feedamounts: [50, 10, 5, 1],
-                feedrate: 5,
-                feedrates: [10, 5, 2, 1],
-                showEstimatedExtrusionInfo: true,
-            },
         },
         dashboard: {
             nonExpandPanels: {
@@ -227,6 +203,7 @@ export const gui: Module<GuiState, any> = {
     mutations,
     modules: {
         console,
+        control,
         gcodehistory,
         macros,
         presets,

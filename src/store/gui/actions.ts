@@ -10,6 +10,7 @@ export const actions: ActionTree<GuiState, RootState> = {
         commit('reset')
 
         dispatch('console/reset')
+        dispatch('control/reset')
         dispatch('gcodehistory/reset')
         dispatch('macros/reset')
         dispatch('presets/reset')

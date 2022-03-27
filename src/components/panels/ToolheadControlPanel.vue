@@ -6,7 +6,7 @@
         :collapsible="true"
         card-class="toolhead-control-panel">
         <!-- PANEL-HEADER 3-DOT-MENU -->
-        <template v-if="controlStyle !== 'bars' && (existsZtilt || existsQGL)" #buttons>
+        <template v-if="customButtons.length >= 1 || (controlStyle !== 'bars' && (existsZtilt || existsQGL))" #buttons>
             <v-menu left offset-y :close-on-content-click="false" class="pa-0">
                 <template #activator="{ on, attrs }">
                     <v-btn icon tile v-bind="attrs" v-on="on">
@@ -30,6 +30,13 @@
                             {{ $t('Settings.ControlTab.QuadGantryLevel', { isDefault: '' }) }}
                         </v-btn>
                     </v-list-item>
+                    <div v-for="(button, index) in customButtons" :key="index">
+                        <v-list-item>
+                            <v-btn small style="width: 100%" @click="doSend(`${button.command}`)">
+                                {{ button.name }}
+                            </v-btn>
+                        </v-list-item>
+                    </div>
                 </v-list>
             </v-menu>
         </template>
@@ -96,6 +103,10 @@ export default class ToolheadControlPanel extends Mixins(BaseMixin, ControlMixin
 
     get actionButton(): string {
         return this.$store.state.gui.control.actionButton ?? this.defaultActionButton
+    }
+
+    get customButtons() {
+        return this.$store.getters['gui/control/getCustomButtons'] ?? []
     }
 
     get displayZOffsetStandby() {
