@@ -362,7 +362,7 @@ import {
     mdiDotsVertical,
 } from '@mdi/js'
 import { Component, Mixins, Watch } from 'vue-property-decorator'
-import { PrinterStateExtruder, PrinterStateExtruderStepper } from '@/store/printer/types'
+import { PrinterStateExtruder, PrinterStateExtruderStepper, PrinterStateToolchangeMacro } from '@/store/printer/types'
 import BaseMixin from '../mixins/base'
 import ControlMixin from '../mixins/control'
 import NumberInput from '@/components/inputs/NumberInput.vue'
@@ -393,7 +393,7 @@ export default class ExtruderControlPanel extends Mixins(BaseMixin, ControlMixin
         return ['printing'].includes(this.printer_state)
     }
 
-    get toolchangeMacros(): string[] {
+    get toolchangeMacros(): PrinterStateToolchangeMacro[] {
         return this.$store.getters['printer/getToolchangeMacros']
     }
 
