@@ -217,12 +217,6 @@ export interface PrinterStateExtruder {
     maxExtrudeOnlyDistance: number
 }
 
-export interface PrinterStateExtruderStepper {
-    key: string
-    name: string
-    extruder: number
-}
-
 export interface PrinterStateToolchangeMacro {
     name: string
     active: boolean
