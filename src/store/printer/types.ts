@@ -169,6 +169,10 @@ export interface PrinterStateMacro {
         // eslint-disable-next-line
         [key: string]: any
     }
+    variables: {
+        // eslint-disable-next-line
+        [key: string]: any
+    }
     params: PrinterStateMacroParams
 }
 
@@ -213,17 +217,13 @@ export interface PrinterStateExtruder {
     maxExtrudeOnlyDistance: number
 }
 
-export interface PrinterStateExtruder {
-    key: string
-    name: string
-    filamentDiameter: number
-    minExtrudeTemp: number
-    nozzleDiameter: number
-    maxExtrudeOnlyDistance: number
-}
-
 export interface PrinterStateExtruderStepper {
     key: string
     name: string
     extruder: number
+}
+
+export interface PrinterStateToolchangeMacro {
+    name: string
+    active: boolean
 }
