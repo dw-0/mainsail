@@ -2,6 +2,8 @@ name: Build Size Report
 on:
   pull_request_target:
     types: [labeled, synchronize, reopened]
+    paths:
+      - 'package.json'
 jobs:
   check:
     runs-on: ubuntu-latest
